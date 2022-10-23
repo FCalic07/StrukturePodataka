@@ -61,14 +61,14 @@ int main() {
 
 	printf("\n\n\nWhich element do you want to delete from the linked list: ");
 	scanf(" %d", &num);
-	DeleteAfter(Head, num-1); //saljes head i num-1 kao izbrisi nakon num-1 jer je funkcija deleteAFTER 
+	DeleteAfter(Head, num - 1); //saljes head i num-1 kao izbrisi nakon num-1 jer je funkcija deleteAFTER 
 
 	PrintList(Head->Next);
 
 	//fali ti dealokacija cijele liste,jer nakon zavrsetka programa mora se uvijek pobrisati memorija
 	DeleteAll(Head);
 	printf("\n\nDeallocation of memory in successful!\n");
-	
+
 	return EXIT_SUCCESS;
 }
 
@@ -111,6 +111,8 @@ Position CreatePerson(char* name, char* surname, int birth_year) {
 	if (!nP) {
 		printf("\tAllocation error!\n");
 		return -1; //ne mozes vracati nP ako ga nema 
+		/*kontam ako ne alocira ostat ce null i onda ce ga provjerit u gornjoj f-ji
+		ali slazem se da je ovo pametnije*/
 	}
 	strcpy(nP->name, name);
 	strcpy(nP->surname, surname);
@@ -123,7 +125,6 @@ Position CreatePerson(char* name, char* surname, int birth_year) {
 /*int InsertFirst(Position Head, Position newPerson) {
 	newPerson->Next = Head->Next;
 	Head->Next = newPerson;
-
 	return EXIT_SUCCESS;
 }*/ // nepotrebna funkcija, sve se moze uraditi sa InsertAfter (radjena je na prredavanju), samo se mijenaju parametru funkcije 
 
@@ -133,9 +134,11 @@ int InsertIntoEnd(Position Head, int num) {
 	char surname[MAX_NAME] = { 0 };
 	int birth_year = 0;
 
-	Last = FindLast(Head);// IZVAN WHILE JER CE SE ONDA STALNO TRAZITI ZADNJI,POTREBAN JE ZADNJI PRIJE UNOSA NA KRAJ
+	/*Last = FindLast(Head); IZVAN WHILE JER CE SE ONDA STALNO TRAZITI ZADNJI,POTREBAN JE ZADNJI PRIJE UNOSA NA KRAJ */
 	while (num) {
-		
+		Last = FindLast(Head); 
+		/*	ne slazem se jer tako ce prvi unesen od korisnika bit zadnji, a smislenije je
+		da kad vec unosi elemente na kraj, da tocno i zadnji unesen bude zadnji u listi, zato mora azurirat zadnjeg*/
 		printf("\nName: ");
 		scanf(" %s", name);
 		printf("Surname: ");
@@ -155,7 +158,7 @@ int AppendList(Position Last, char* name, char* surname, int birth_year) {
 
 	if (!nP) {
 		printf("\tAllocation error!\n");
-		return ALLOCATION_ERROR; //ne mozes vracati nP ako ga nema 
+		return ALLOCATION_ERROR;
 	}
 
 	InsertAfter(Last, nP);
@@ -163,12 +166,6 @@ int AppendList(Position Last, char* name, char* surname, int birth_year) {
 	return EXIT_SUCCESS;
 }
 
-/*int InsertLast(Position Last, Position newPerson) {
-	newPerson->Next = Last->Next;
-	Last->Next = newPerson;
-
-	return EXIT_SUCCESS;
-}*/ // NEPOTREBNO 
 
 Position FindLast(Position Head) {
 	Position TEMP = Head;
@@ -202,47 +199,20 @@ int PrintPerson_Surname(Position Surname) {
 	return EXIT_SUCCESS;
 }
 
-/*int DeleteElement(Position Head, int num) {//nepotrebo prekomplicirano, jednostavno koristis DeleteAfter i brises next element od onoga kojeg korisnik odabere(on postaje previous)
-	Position Element = Head;
-	Position PreviousElement = NULL;
-
-	int i = 1;
-	while (!(i == num)) {
-		Element = Element->Next;
-		if (!Element) {
-			printf("\nError! Element does not exist.\n");
-			return EXIT_SUCCESS;
-		}
-		i++;
-	}
-	PreviousElement = FindPrevious(Head, Element);
-	PreviousElement->Next = Element->Next;
-	free(Element);
-
-	return EXIT_SUCCESS;
-}
-
-
-Position FindPrevious(Position Head, Position Element) {
-	Position TEMP = Head;
-	while (!(TEMP->Next == Element)) // javlja se greska "Unable to read memory" ako se odabere da se obrise prvi element,zato sto ako se odabere prvi element, ovaj uvjet ga odmah provjerava sa njegovim nextom tj. automatski ga preskace, pa se prakticki izidje iz petlje, tj TEMP postaje NULL, pa TEMP->NEXT pristupa izvan memorije "Unhandled exception thrown: read access violation. **TEMP** was nullptr."
-		
-		TEMP = TEMP->Next;
-
-	return TEMP;
-}
-*/
-
-
+//nepotrebo prekomplicirano, jednostavno koristis DeleteAfter i brises next element od onoga kojeg korisnik odabere(on postaje previous)
 
 //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 int DeleteAfter(Position head, int prethodni)
 {
+	if (prethodni < 1) { /*Eh, zasto ne*/
+		printf("Non-existing element. \n");
+		return NULL;
+	}
 	Position temp1 = FindPrev(head, prethodni);
 	Position temp2 = NULL;
 	if (!temp1)
 	{
-		printf("Nepostojeci element.\n");
+		printf("Non-existing element.\n");
 		return NULL;
 	}
 
@@ -289,11 +259,8 @@ int InsertAfter(Position head, Position newPerson)
 	head->Next = newPerson;
 
 	return EXIT_SUCCESS;
-}
-//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+} /*cool jedna funkcija za obje stvari*/
 
-
-//dealokacija
 int DeleteAll(Position head)
 {
 	Position temp1 = head;
