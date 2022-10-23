@@ -20,23 +20,29 @@ Position FindLast(Position Head);
 int PrintList(Position Head);
 int InsertIntoBeggining(Position Head, int num);
 int PrependList(Position Head, char* name, char* surname, int birth_year);
-int InsertFirst(Position Head, Position newPerson);
+//int InsertFirst(Position Head, Position newPerson);
 
 int InsertIntoEnd(Position Head, int num);
 int AppendList(Position Last, char* name, char* surname, int birth_year);
-int InsertLast(Position Last, Position newPerson);
+//int InsertLast(Position Last, Position newPerson);
 
 int PersonBySurname(Position Head, char* surname);
 int PrintPerson_Surname(Position Surname);
 
-int DeleteElement(Position Head, int num);
-Position FindPrevious(Position Head, Position Element);
+//int DeleteElement(Position Head, int num);
+//Position FindPrevious(Position Head, Position Element);
+int InsertAfter(Position head, Position newPerson);
+Position FindPrev(Position head, int prethodni);
+int DeleteAfter(Position head, int prethodni);
+
+//dealokacija
+int DeleteAll(Position head);
 
 int main() {
-	Person Zero = { .name = {0},.surname = {0},.birth_year = 0,.Next = NULL };
-	Position Head = &Zero;
+	Person Zeroth = { .name = {0},.surname = {0},.birth_year = 0,.Next = NULL };
+	Position Head = &Zeroth;
 	int num = 0;
-	char surname[MAX_NAME] = { 0 }; 
+	char surname[MAX_NAME] = { 0 };
 
 	printf("How many people do you want to add at the beginning: ");
 	scanf(" %d", &num);
@@ -55,10 +61,14 @@ int main() {
 
 	printf("\n\n\nWhich element do you want to delete from the linked list: ");
 	scanf(" %d", &num);
-	DeleteElement(Head->Next, num);
+	DeleteAfter(Head, num-1); //saljes head i num-1 kao izbrisi nakon num-1 jer je funkcija deleteAFTER 
 
 	PrintList(Head->Next);
 
+	//fali ti dealokacija cijele liste,jer nakon zavrsetka programa mora se uvijek pobrisati memorija
+	DeleteAll(Head);
+	printf("\n\nDeallocation of memory in successful!\n");
+	
 	return EXIT_SUCCESS;
 }
 
@@ -66,7 +76,7 @@ int InsertIntoBeggining(Position Head, int num) {
 	char name[MAX_NAME] = { 0 };
 	char surname[MAX_NAME] = { 0 };
 	int birth_year = 0;
-	
+
 	while (num) {
 		printf("\nName: ");
 		scanf(" %s", name);
@@ -88,8 +98,8 @@ int PrependList(Position Head, char* name, char* surname, int birth_year) {
 	if (!nP) {
 		return ALLOCATION_ERROR;
 	}
-	
-	InsertFirst(Head, nP);
+
+	InsertAfter(Head, nP);
 
 	return EXIT_SUCCESS;
 }
@@ -99,8 +109,8 @@ Position CreatePerson(char* name, char* surname, int birth_year) {
 
 	nP = (Position)malloc(sizeof(Person));
 	if (!nP) {
-		printf("\tAllocation error!");	
-		return nP;
+		printf("\tAllocation error!\n");
+		return -1; //ne mozes vracati nP ako ga nema 
 	}
 	strcpy(nP->name, name);
 	strcpy(nP->surname, surname);
@@ -110,12 +120,12 @@ Position CreatePerson(char* name, char* surname, int birth_year) {
 	return nP;
 }
 
-int InsertFirst(Position Head, Position newPerson) {
+/*int InsertFirst(Position Head, Position newPerson) {
 	newPerson->Next = Head->Next;
 	Head->Next = newPerson;
 
 	return EXIT_SUCCESS;
-}
+}*/ // nepotrebna funkcija, sve se moze uraditi sa InsertAfter (radjena je na prredavanju), samo se mijenaju parametru funkcije 
 
 int InsertIntoEnd(Position Head, int num) {
 	Position Last = NULL;
@@ -123,8 +133,9 @@ int InsertIntoEnd(Position Head, int num) {
 	char surname[MAX_NAME] = { 0 };
 	int birth_year = 0;
 
+	Last = FindLast(Head);// IZVAN WHILE JER CE SE ONDA STALNO TRAZITI ZADNJI,POTREBAN JE ZADNJI PRIJE UNOSA NA KRAJ
 	while (num) {
-		Last = FindLast(Head);
+		
 		printf("\nName: ");
 		scanf(" %s", name);
 		printf("Surname: ");
@@ -143,20 +154,21 @@ int AppendList(Position Last, char* name, char* surname, int birth_year) {
 	nP = CreatePerson(name, surname, birth_year);
 
 	if (!nP) {
-		return ALLOCATION_ERROR;
+		printf("\tAllocation error!\n");
+		return ALLOCATION_ERROR; //ne mozes vracati nP ako ga nema 
 	}
 
-	InsertLast(Last, nP);
+	InsertAfter(Last, nP);
 
 	return EXIT_SUCCESS;
 }
 
-int InsertLast(Position Last, Position newPerson) {
+/*int InsertLast(Position Last, Position newPerson) {
 	newPerson->Next = Last->Next;
 	Last->Next = newPerson;
 
 	return EXIT_SUCCESS;
-}
+}*/ // NEPOTREBNO 
 
 Position FindLast(Position Head) {
 	Position TEMP = Head;
@@ -190,10 +202,10 @@ int PrintPerson_Surname(Position Surname) {
 	return EXIT_SUCCESS;
 }
 
-int DeleteElement(Position Head, int num) {
+/*int DeleteElement(Position Head, int num) {//nepotrebo prekomplicirano, jednostavno koristis DeleteAfter i brises next element od onoga kojeg korisnik odabere(on postaje previous)
 	Position Element = Head;
 	Position PreviousElement = NULL;
-	
+
 	int i = 1;
 	while (!(i == num)) {
 		Element = Element->Next;
@@ -203,29 +215,97 @@ int DeleteElement(Position Head, int num) {
 		}
 		i++;
 	}
-	PreviousElement = FindPrevious(Head,Element);
+	PreviousElement = FindPrevious(Head, Element);
 	PreviousElement->Next = Element->Next;
 	free(Element);
 
 	return EXIT_SUCCESS;
 }
 
+
 Position FindPrevious(Position Head, Position Element) {
 	Position TEMP = Head;
-	while (!(TEMP->Next == Element))
+	while (!(TEMP->Next == Element)) // javlja se greska "Unable to read memory" ako se odabere da se obrise prvi element,zato sto ako se odabere prvi element, ovaj uvjet ga odmah provjerava sa njegovim nextom tj. automatski ga preskace, pa se prakticki izidje iz petlje, tj TEMP postaje NULL, pa TEMP->NEXT pristupa izvan memorije "Unhandled exception thrown: read access violation. **TEMP** was nullptr."
+		
 		TEMP = TEMP->Next;
 
-		return TEMP;
+	return TEMP;
 }
+*/
+
+
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+int DeleteAfter(Position head, int prethodni)
+{
+	Position temp1 = FindPrev(head, prethodni);
+	Position temp2 = NULL;
+	if (!temp1)
+	{
+		printf("Nepostojeci element.\n");
+		return NULL;
+	}
+
+	temp2 = temp1->Next;
+	temp1->Next = temp2->Next;
+
+	free(temp2);
+
+
+	return EXIT_SUCCESS;
+}
+
+Position FindPrev(Position head, int prethodni)
+{
+	Position temp = head;
+
+	while (prethodni)
+	{
+		temp = temp->Next;
+		prethodni--;
+	}
+
+	return temp;
+}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 int PrintList(Position Head) {
 	Position TEMP = Head;
 	int i = 1;
 	while (TEMP) {
-		printf("\n\n%d\nName: %s\nSurname: %s\nBirth year: %d",i, TEMP->name, TEMP->surname, TEMP->birth_year);
+		printf("\n%d\nName: %s\nSurname: %s\nBirth year: %d", i, TEMP->name, TEMP->surname, TEMP->birth_year);
 		TEMP = TEMP->Next;
 		i++;
 	}
+
+	return EXIT_SUCCESS;
+}
+
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+int InsertAfter(Position head, Position newPerson)
+{
+	newPerson->Next = head->Next;
+	head->Next = newPerson;
+
+	return EXIT_SUCCESS;
+}
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+//dealokacija
+int DeleteAll(Position head)
+{
+	Position temp1 = head;
+	Position temp2 = NULL;
+
+	while (temp1->Next)
+	{
+		temp2 = head->Next;
+		temp1->Next = temp2->Next;
+		free(temp2);
+	}
+	head = NULL;
 
 	return EXIT_SUCCESS;
 }
