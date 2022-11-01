@@ -31,8 +31,8 @@ int AddAtBeggining(Position Head);
 int AddAtEnd(Position Head);
 Position FindLast(Position Head);
 int FindSurname(Position Head);
-int DeleteElement(Position Head);
-int DeleteAfter(Position Head, Position pos);
+int DeleteElement(Position Head); //Modificirano, moze se dodat i na addafter i addbefore, doduse jos nisam nacisto hocemol to
+int DeleteAfter(Position Head, Position pos); //skontat ces da malo nema smisla ime s obzirom kako ja koristim al djaba kad je men tako lakse
 Position FindPrev(Position Head, Position pos);
 
 int SurnameSort(Position Head);
@@ -194,26 +194,53 @@ int FindSurname(Position Head) {
 	return EXIT_SUCCESS;
 }
 
-int DeleteElement(Position Head) { //ovo mi jako smeta jer sta ako ima vise prezime//
-	Position TEMP = Head;				// ali u isto vrijeme ne znam sta je najbolje da pitam korisnika onda//
+int DeleteElement(Position Head) { //pita za prezime pa za ime 
+	Position TEMP = Head;				
 	char surname[MAX_NAME] = { 0 };
+	char name[MAX_NAME] = { 0 };
 	int count = 0;
 
 	printf("\nEnter the surname of the person you want to delete: ");
 	scanf(" %s", surname);
 
-
-	while (TEMP) {
+	//pronalazi koliko ima s takvim prezimenom  PROTOTIP
+	//pita te za ime
+	while (TEMP) {		/*broji koliko ih ima*/
 		if (strcmp(TEMP->surname, surname) == 0) {
-			DeleteAfter(Head, TEMP);
 			count++;
-			break;
 		}
 		TEMP = TEMP->Next;
 	}
-	if (!count) {
+
+	TEMP = Head; //reset
+
+	if (count == 1) { //ako je jedan s takvim prezimenom
+		while (TEMP) {
+			if (strcmp(TEMP->surname, surname) == 0) {
+				DeleteAfter(Head, TEMP);
+			}
+			TEMP = TEMP->Next;
+		}
+	}
+	else if (count > 1) {	/*pita za ime jer ih ima vise*/
+		count = 0;
+		printf("\nThere is more than one person with that surname.\nPlease enter the first name of the person you want to delete: ");
+		scanf(" %s", name);
+		while (TEMP) {  //sad trazi i to ime
+			if ((strcmp(TEMP->name, name) == 0) && (strcmp(TEMP->surname, surname) == 0)) {
+				DeleteAfter(Head, TEMP);
+				count++;
+				break;
+			}
+			TEMP = TEMP->Next;
+		}
+		if (!count)
+			printf("\nNo such person!\n");
+	}
+	else { //klasicno ako nema prezimena tog
 		printf("\nA person with that surname does not exist!\n");
 	}
+
 	return EXIT_SUCCESS;
 }
 
@@ -280,6 +307,8 @@ int SurnameSort(Position Head) {
 		}
 		end = pos;
 	}
+
+	printf("\nList is sorted alphabetically.\n");
 
 	return EXIT_SUCCESS;
 }
