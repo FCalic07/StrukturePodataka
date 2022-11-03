@@ -127,7 +127,6 @@ int AddAtBeggining(Position Head) {
 	Position nP = NULL;
 	nP = DataEntry(nP);		/*provjeri trebal provjeravat i ovdje ///////////////*/
 							
-//MOZES A I NEMORAS (PITAT CEMO)
 	if (!nP)
 		return ALLOCATION_ERROR;
 
@@ -183,6 +182,8 @@ int AddAtEnd(Position Head) {
 	Position nP = NULL;
 
 	nP = DataEntry(nP);
+	if (!nP)
+		return ALLOCATION_ERROR;
 	Last = FindLast(Head);
 	InsertAfter(Last, nP);
 
@@ -206,7 +207,7 @@ int FindSurname(Position Head) {
 	printf("\nEnter the surname you want to find: ");
 	scanf(" %s", surname);
 
-	while (TEMP) { /*nmg ovdje stavit if usporedbu jer temp=temp.next mi mora bit izvan*/
+	while (TEMP) {
 		if (strcmp(TEMP->surname, surname) == 0) {
 			PrintPerson(TEMP);
 			count++;
@@ -456,6 +457,11 @@ int DeleteAll(Position Head)
 		free(temp2);
 	}
 	Head = NULL;
+	
+	while(Head.next){
+	DeleteAll(Head.next);
+	Head=0;
+	}
 	*/
 
 	//MISLIM DA MOZE OVAKO, NE SICAM SE ALI NISAM NASO NA GRESKU
