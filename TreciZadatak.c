@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <time.h> //ZBOG RAND FJE
 
 #define MAX_NAME (128)
 #define ALLOCATION_ERROR (-1)
@@ -31,8 +32,8 @@ int AddAtBeggining(Position Head);
 int AddAtEnd(Position Head);
 Position FindLast(Position Head);
 int FindSurname(Position Head);
-int DeleteElement(Position Head);
-int DeleteAfter(Position Head, Position pos);
+int DeleteElement(Position Head); //Modificirano, moze se dodat i na addafter i addbefore, doduse jos nisam nacisto hocemol to
+int DeleteAfter(Position Head, Position pos); //skontat ces da malo nema smisla ime s obzirom kako ja koristim al djaba kad je men tako lakse
 Position FindPrev(Position Head, Position pos);
 
 int SurnameSort(Position Head);
@@ -47,16 +48,18 @@ int main() {
 	Person Zeroth = { .name = {0},.surname = {0},.birth_year = 0,.Next = NULL };
 	Position Head = &Zeroth;
 	char choice = '\0';
+	srand((unsigned)time(NULL));
+	int status = rand();//da izbjegnemo magic brojeve neka rand dodijeli broj za status (na kraju dealokacije status svakako treba biti 0,pa sve razlicito od 0 je greska)
 
 	while (while_on) {
 		printMenu(); /*meni*/
 		scanf(" %c", &choice);
-		choice = toupper(choice);
+		choice = toupper(choice);//SEHR GUT
 
 		if (choice == 'Z') /*end program*/
 			break;
 
-		switch (choice) { /*opcije*/ //ovdje mi je fazon da sve budu s parametrom head jer je mocno
+		switch (choice) { /*opcije*/ //ovdje mi je fazon da sve budu s parametrom head jer je mocno //DOBRO NEGDI NIJE LOSE POSLATI NESTO DRUGO,NPR head.next ZA PRINT FUNKCIJU,CISTO RADI MANJE PISANJA KODA 
 		case('A'):
 			AddAtBeggining(Head);
 			break;
@@ -67,7 +70,7 @@ int main() {
 			FindSurname(Head);
 			break;
 		case('D'):
-			DeleteElement(Head); /*ovo mi je labavo*/
+			DeleteElement(Head); /*ovo mi je labavo*/ //ISPRAVIO SAM JEDNU GRESKICU 
 			break;
 		case('P'):
 			PrintList(Head);
@@ -88,30 +91,51 @@ int main() {
 			ReadFromFile(Head);
 			break;
 		default:
-			printf("\nSta ti je jarane\n");
+			printf("\nPlease select valid option (A-Z)\n");
 		}
 	}
 	
-	DeleteAll(Head); /*zaboravio sam kako je ono duje uradio*/
-	printf("\nDeallocation of memory is successful!\n");
+	//dodao sam ovaj status kao provjeru dealokacije kako je Klara prosli put rekla
+	status=DeleteAll(Head); /*zaboravio sam kako je ono duje uradio*/ //NE SICAM SE NI JA TOCNO, NESTO SAM PROBO
+	if (status == 0)
+		printf("\nDeallocation of memory is successful!\n");
+	else
+		printf("Deallocation ERROR\n");
 
 	return EXIT_SUCCESS;
 }
 
+//ovako je preglednije
 int printMenu() {
-	printf("\n--------------------------------------\n\t\tMENU\n--------------------------------------\nA) Add an element at the beggining\nB) Add an element at the end\nC) Find surname\nD) Delete element\nP) Print list\nS) Sort by surnames\nQ) Add after an element\nE) Add before an element\nW) Write the list into a file\nR) Read the list from a file\nZ) End\n\n");
+	printf("\n--------------------------------------\n\t\tMENU\n--------------------------------------"
+		"\nA) Add an element at the beggining"
+		"\nB) Add an element at the end"
+		"\nC) Find surname"
+		"\nD) Delete element"
+		"\nP) Print list"
+		"\nS) Sort by surnames"
+		"\nQ) Add after an element"
+		"\nE) Add before an element"
+		"\nW) Write the list into a file"
+		"\nR) Read the list from a file"
+		"\nZ) End\n\n");
+
 	return EXIT_SUCCESS;
 }
 
 int AddAtBeggining(Position Head) {
 	Position nP = NULL;
 	nP = DataEntry(nP);		/*provjeri trebal provjeravat i ovdje ///////////////*/
+							
+	if (!nP)
+		return ALLOCATION_ERROR;
+
 	InsertAfter(Head, nP);
 
 	return EXIT_SUCCESS;
 }
 
-Position DataEntry(Position newPerson) { /* zivciralo me sto se ponavlja */
+Position DataEntry(Position newPerson) { /* zivciralo me sto se ponavlja */ //HAHA JEBAT GA NEK SE PONAVLJA
 	char name[MAX_NAME] = { 0 };
 	char surname[MAX_NAME] = { 0 };
 	int birth_year = 0;
@@ -158,6 +182,8 @@ int AddAtEnd(Position Head) {
 	Position nP = NULL;
 
 	nP = DataEntry(nP);
+	if (!nP)
+		return ALLOCATION_ERROR;
 	Last = FindLast(Head);
 	InsertAfter(Last, nP);
 
@@ -181,7 +207,7 @@ int FindSurname(Position Head) {
 	printf("\nEnter the surname you want to find: ");
 	scanf(" %s", surname);
 
-	while (TEMP) { /*nmg ovdje stavit if usporedbu jer temp=temp.next mi mora bit izvan*/
+	while (TEMP) {
 		if (strcmp(TEMP->surname, surname) == 0) {
 			PrintPerson(TEMP);
 			count++;
@@ -194,26 +220,54 @@ int FindSurname(Position Head) {
 	return EXIT_SUCCESS;
 }
 
-int DeleteElement(Position Head) { //ovo mi jako smeta jer sta ako ima vise prezime//
-	Position TEMP = Head;				// ali u isto vrijeme ne znam sta je najbolje da pitam korisnika onda//
+int DeleteElement(Position Head) { //pita za prezime pa za ime 
+	Position TEMP = Head->Next;
 	char surname[MAX_NAME] = { 0 };
+	char name[MAX_NAME] = { 0 };
 	int count = 0;
 
 	printf("\nEnter the surname of the person you want to delete: ");
 	scanf(" %s", surname);
 
-
-	while (TEMP) {
+	//pronalazi koliko ima s takvim prezimenom  PROTOTIP
+	//pita te za ime
+	while (TEMP) {		/*broji koliko ih ima*/
 		if (strcmp(TEMP->surname, surname) == 0) {
-			DeleteAfter(Head, TEMP);
 			count++;
-			break;
 		}
 		TEMP = TEMP->Next;
 	}
-	if (!count) {
+
+	TEMP = Head->Next; //reset
+
+	if (count == 1) { //ako je jedan s takvim prezimenom
+		while (TEMP!=NULL) {//OVO JE MENI LOGICNIJI NACIN PROVJERE 
+			if (strcmp(TEMP->surname, surname) == 0) {
+				DeleteAfter(Head, TEMP);
+				break;//OVDJE TREBA BREAK JER KAD SE ODRADI DeleteAfter, nema potrebe da se dalje provjerava petlja (JER JE COUNT==1), samo se ulazi u neku nedostupnu memoriju pa dolazi do read access violation ako se odabere da se obrise prvi element
+			}
+			TEMP = TEMP->Next;
+		}
+	}
+	else if (count > 1) {	/*pita za ime jer ih ima vise*/
+		count = 0;
+		printf("\nThere is more than one person with that surname.\nPlease enter the first name of the person you want to delete: ");
+		scanf(" %s", name);
+		while (TEMP) {  //sad trazi i to ime
+			if ((strcmp(TEMP->name, name) == 0) && (strcmp(TEMP->surname, surname) == 0)) {
+				DeleteAfter(Head, TEMP);
+				count++;
+				break;
+			}
+			TEMP = TEMP->Next;
+		}
+		if (!count)
+			printf("\nNo such person!\n");
+	}
+	else { //klasicno ako nema prezimena tog
 		printf("\nA person with that surname does not exist!\n");
 	}
+
 	return EXIT_SUCCESS;
 }
 
@@ -221,6 +275,7 @@ int DeleteAfter(Position Head, Position pos) {
 	Position TEMP = pos;
 	Position prev_TEMP = FindPrev(Head, TEMP);
 	prev_TEMP->Next = TEMP->Next;
+	
 	free(TEMP);
 
 	return EXIT_SUCCESS;
@@ -281,6 +336,8 @@ int SurnameSort(Position Head) {
 		end = pos;
 	}
 
+	printf("\nList is sorted alphabetically.\n");
+
 	return EXIT_SUCCESS;
 }
 
@@ -335,7 +392,7 @@ int AddBefore(Position Head) {
 
 int WriteInFile(Position Head) {
 	Position TEMP = Head->Next;
-	
+
 	FILE* fp = NULL;
 	fp = fopen("People.txt", "w");
 	if (!fp) {
@@ -344,7 +401,7 @@ int WriteInFile(Position Head) {
 	}
 
 	while (TEMP) {
-		fprintf(fp, "\n%s %s %d", TEMP->name, TEMP->surname, TEMP->birth_year);
+		fprintf(fp, "%s %s %d\n", TEMP->name, TEMP->surname, TEMP->birth_year); //izbriso sam prvi \n cisto ako se ikad bude citalo iz te datoteke preko buffera da ne bude nekih komplikacija 
 		TEMP = TEMP->Next;
 	}
 
@@ -355,12 +412,12 @@ int WriteInFile(Position Head) {
 	return EXIT_SUCCESS;
 }
 
-int ReadFromFile(Position Head) { 
+int ReadFromFile(Position Head) {
 	Position TEMP = Head;
 	Position newPerson = NULL;
 	Position Last = NULL;
-	char name[MAX_NAME] = { 0 }; 
-	char surname[MAX_NAME] = { 0 }; 
+	char name[MAX_NAME] = { 0 };
+	char surname[MAX_NAME] = { 0 };
 	int birth_year = 0;
 
 	FILE* fp = NULL;
@@ -369,8 +426,8 @@ int ReadFromFile(Position Head) {
 		printf("\nFile can not open!\n");
 		return FILE_OPENING_ERROR;
 	}
-	
-	DeleteAll(TEMP); //idk jel zele da obrisem sve ili da dodajem na kraj ali kako god nije nesto tesko
+
+	DeleteAll(TEMP); //idk jel zele da obrisem sve ili da dodajem na kraj ali kako god nije nesto tesko //STA CE TI OVDJE DELETE ALL
 
 	while (!feof(fp)) {
 		fscanf(fp, "%s%s%d", name, surname, &birth_year);
@@ -390,7 +447,7 @@ int ReadFromFile(Position Head) {
 
 int DeleteAll(Position Head)
 {
-	Position temp1 = Head;
+	/*Position temp1 = Head;
 	Position temp2 = NULL;
 
 	while (temp1->Next)
@@ -399,6 +456,18 @@ int DeleteAll(Position Head)
 		temp1->Next = temp2->Next;
 		free(temp2);
 	}
+	Head = NULL;
+	
+	while(Head.next){
+	DeleteAll(Head.next);
+	Head=0;
+	}
+	*/
+
+	//MISLIM DA MOZE OVAKO, NE SICAM SE ALI NISAM NASO NA GRESKU
+	while (Head->Next)
+		DeleteAfter(Head, Head->Next);
+
 	Head = NULL;
 
 	return EXIT_SUCCESS;
