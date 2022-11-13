@@ -21,10 +21,12 @@ int Push(double number, Position Head);
 int Operation(char operand, Position Head);
 int DeleteAfter(Position pos);
 int PrintPostfixResult(Position Head);
+int Deallocation(Position Head);
 
 int main() {
 	Stack Zeroth = { .number = 0,.Next = NULL };
 	Position Head = &Zeroth;
+	int status = 7;
 
 	char filename[MAX_NAME] = { 0 };
 	
@@ -32,6 +34,12 @@ int main() {
 	scanf(" %s", filename);
 	
 	ReadFromFile(filename, Head);
+
+	status = Deallocation(Head);
+	if (status == 0)
+		printf("\nDeallocation of memory is successful!\n");
+	else
+		printf("Deallocation ERROR\n");
 
 	return EXIT_SUCCESS;
 }
@@ -142,7 +150,15 @@ int PrintPostfixResult(Position Head) {
 		return POSTFIX_ERROR;
 	}
 
-	printf("\nResult: %lf", Head->Next->number);
+	printf("\nResult: %.2lf", Head->Next->number);
 
+	return EXIT_SUCCESS;
+}
+
+int Deallocation(Position Head) {
+	while (Head->Next)
+		DeleteAfter(Head);
+
+	Head = NULL;
 	return EXIT_SUCCESS;
 }
