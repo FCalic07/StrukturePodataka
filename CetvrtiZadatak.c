@@ -7,8 +7,7 @@
 #define MAX_NAME (128)
 #define MAX_LINE (1024)
 #define FILE_OPENING_ERROR (-1)
-#define ALLOCATION_ERROR (-1)
-#define while_on (1)
+#define ALLOCATION_ERROR (-2)
 
 struct _elements;
 typedef struct _elements* EPosition;
@@ -44,12 +43,14 @@ PPosition MenuAddition(PPosition pHead);
 PPosition PolynominalMultiplication(PPosition Result, PPosition pHead, int pos);
 PPosition MenuMultiplication(PPosition pHead);
 int PrintPolynominal(PPosition Result);
+int Deallocation(PPosition pHead);
 
 
 int main() {
 	Polynominal Zeroth = { .pNext = NULL,.eNext = NULL };
 	PPosition pHead = &Zeroth;
 	char filename[MAX_NAME] = { 0 };
+	int status = 2;
 
 	EnterFilename(filename); //unos imena datoteke
 
@@ -59,6 +60,14 @@ int main() {
 
 	Menu(pHead);
 
+	status = Deallocation(pHead);
+	if (status == 0)
+		printf("\nDeallocation of memory is successful!\n");
+	else
+		printf("Deallocation ERROR\n");
+	
+
+
 	return EXIT_SUCCESS;
 }
 
@@ -66,12 +75,13 @@ int main() {
 int EnterFilename(char* filename) {
 	printf("Please enter file name: ");
 	scanf(" %s", filename);
+
 	return EXIT_SUCCESS;
 }
 
 int Menu(PPosition pHead) {
 	int count = 0, poly = 0, choice = 0;
-	PPosition Result = CreateNewPoly();
+	PPosition Result = NULL;
 	count = CountPolynominals(pHead);
 
 	printf("\nChoose an action"
@@ -86,14 +96,14 @@ int Menu(PPosition pHead) {
 		Result = MenuMultiplication(pHead);
 		break;
 	default:
-		printf("\nNa kurcu te nosam");
+		printf("\nWrong choice!\n");
 	}
 
 	return EXIT_SUCCESS;
 }
 
 PPosition MenuAddition(PPosition pHead) {
-	int count = 0, poly = 0, choice = 1;
+	int count = 0, poly = 0, choice = 0;
 	PPosition Result = CreateNewPoly();
 	count = CountPolynominals(pHead);
 
@@ -102,7 +112,7 @@ PPosition MenuAddition(PPosition pHead) {
 	while (choice != 2) {
 		Result = PolynominalAddition(Result, pHead, poly);
 		printf("\n1)	+"
-			   "\n2)	=\n");
+			"\n2)	=\n");
 		scanf(" %d", &choice);
 		if (choice == 1) {
 			printf("\nChoose a poynominal: ");
@@ -118,7 +128,7 @@ PPosition MenuAddition(PPosition pHead) {
 }
 
 PPosition MenuMultiplication(PPosition pHead) {
-	int count = 0, poly = 0, choice = 1;
+	int count = 0, poly = 0, choice = 0;
 	PPosition Result = CreateNewPoly();
 	count = CountPolynominals(pHead);
 	Result->eNext->coef = 1;
@@ -129,7 +139,7 @@ PPosition MenuMultiplication(PPosition pHead) {
 	while (choice != 2) {
 		Result = PolynominalMultiplication(Result, pHead, poly);
 		printf("\n1)	*"
-			   "\n2)	=\n");
+			"\n2)	=\n");
 		scanf(" %d", &choice);
 		if (choice == 1) {
 			printf("\nChoose a poynominal: ");
@@ -241,7 +251,7 @@ EPosition CreateNewElement(int coef, int exp) {
 
 int SortElement(PPosition Poly, EPosition Element) {
 	EPosition TEMP = Poly->eNext; //ovo ti je Head element od ovog polinoma
-	while (TEMP->eNext != NULL && TEMP->eNext->exp < Element->exp) {
+	while (TEMP->eNext != NULL && TEMP->eNext->exp > Element->exp) {
 		TEMP = TEMP->eNext;
 	}
 	Merge(TEMP, Element);
@@ -317,7 +327,7 @@ int CountPolynominals(PPosition pHead) {
 }
 
 PPosition PolynominalMultiplication(PPosition Result, PPosition pHead, int pos) {
-	int coef = 0, exp = 0, count = 0;
+	int count = 0;
 	PPosition newPoly = NULL;
 	EPosition newElement = NULL;
 	PPosition temp = pHead;
@@ -337,12 +347,12 @@ PPosition PolynominalMultiplication(PPosition Result, PPosition pHead, int pos) 
 	EPosition i = NULL;
 	EPosition j = NULL;
 
-	for (i = head1; i != NULL; i = i->eNext){
+	for (i = head1; i != NULL; i = i->eNext) {
 		for (j = head2; j != NULL; j = j->eNext)
 		{
 			newElement = CreateNewElement(i->coef * j->coef, i->exp + j->exp);
-			if(newElement->coef!=0)
-			SortElement(newPoly, newElement);
+			if (newElement->coef != 0)
+				SortElement(newPoly, newElement);
 		}
 	}
 
@@ -391,3 +401,35 @@ int PrintPolynominal(PPosition Result) {
 
 	return EXIT_SUCCESS;
 }
+
+int Deallocation(PPosition pHead)
+{
+	PPosition temp = pHead->pNext;
+	while (temp->pNext) {
+		while (temp->eNext->eNext)
+		{
+			DeleteAfter(temp->eNext);
+		}
+
+		DeletePoly(temp);
+	}
+
+	return EXIT_SUCCESS;
+}
+
+int DeletePoly(PPosition head)
+{
+	PPosition temp1 = head;
+	PPosition temp2 = NULL;
+
+	while (temp1->pNext)
+	{
+		temp2 = temp1->pNext;
+		temp1->pNext = temp2->pNext;
+		free(temp2);
+	}
+
+
+	return EXIT_SUCCESS;
+}
+
