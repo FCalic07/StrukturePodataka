@@ -58,6 +58,7 @@ int ReadFromFile(char* filename, Position Head) {
 		fgets(buffer, MAX_LINE, fp);
 		ReadBuffer(buffer, Head);
 		PrintPostfixResult(Head);
+		DeleteAfter(Head);
 		}
 
 	fclose(fp);
