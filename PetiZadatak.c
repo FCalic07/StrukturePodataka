@@ -18,6 +18,7 @@ typedef struct _stack {
 
 int ReadFromFile(char* filename, Position Head);
 int Push(double number, Position Head);
+int Pop(Position Head);
 int Operation(char operand, Position Head);
 int DeleteAfter(Position pos);
 int PrintPostfixResult(Position Head);
@@ -104,14 +105,12 @@ int Operation(char operand, Position Head) {
 	double num1 = 0, num2 = 0, result = 0;
 	
 	if (!Head->Next || !Head->Next->Next) {
-		printf("Incorrect postfix expression!"); //valjda
+		printf("Incorrect postfix expression!	1"); //valjda
 		return POSTFIX_ERROR;
 	}
 
-	num1 = Head->Next->number;
-	num2 = Head->Next->Next->number;
-
-	DeleteAfter(Head);
+	num1 = Pop(Head);
+	num2 = Pop(Head);
 
 	switch (operand) {
 	case '+':
@@ -127,31 +126,40 @@ int Operation(char operand, Position Head) {
 		result = num2 / num1;
 		break;
 	default:
-		printf("Incorrect postfix expression!");
+		printf("Incorrect postfix expression!	2");
 		return POSTFIX_ERROR;
 	}
 
-	Head->Next->number = result;
+	Push(result, Head);
 
 	return EXIT_SUCCESS;
 }
 
-int DeleteAfter(Position pos){
-	Position TEMP = pos->Next;
-	pos->Next = TEMP->Next;
+int Pop(Position Head){
+	Position TEMP = Head->Next;
+	double temp_number = TEMP->number;
 	
+	Head->Next = TEMP->Next;
 	free(TEMP);
 
-	return EXIT_SUCCESS;
+	return temp_number;
 }
 
 int PrintPostfixResult(Position Head) {
 	if (!Head->Next || Head->Next->Next) {
-		printf("Incorrect postfix expression!"); //valjda
+		printf("Incorrect postfix expression!	3"); //valjda
 		return POSTFIX_ERROR;
 	}
 
 	printf("\nResult: %.2lf", Head->Next->number);
+
+	return EXIT_SUCCESS;
+}
+
+int DeleteAfter(Position pos) {
+	Position TEMP = pos->Next;
+	pos->Next = TEMP->Next;
+	free(TEMP);
 
 	return EXIT_SUCCESS;
 }
