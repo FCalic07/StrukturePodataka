@@ -21,7 +21,7 @@ int Push(double number, Position Head);
 int Pop(Position Head);
 int Operation(char operand, Position Head);
 int DeleteAfter(Position pos);
-int PrintPostfixResult(Position Head);
+int PrintPostfixResult(Position Head,int count);
 int Deallocation(Position Head);
 
 int main() {
@@ -30,10 +30,10 @@ int main() {
 	int status = 7;
 
 	char filename[MAX_NAME] = { 0 };
-	
+
 	printf("\nFile name:	");
 	scanf(" %s", filename);
-	
+
 	ReadFromFile(filename, Head);
 
 	status = Deallocation(Head);
@@ -48,7 +48,8 @@ int main() {
 int ReadFromFile(char* filename, Position Head) {
 	FILE* fp = NULL;
 	char buffer[MAX_LINE] = { 0 };
-	
+	int count = 1;
+
 	fp = fopen(filename, "r");
 	if (!fp) {
 		printf("\nFile does not exist.");
@@ -58,9 +59,10 @@ int ReadFromFile(char* filename, Position Head) {
 	while (!feof(fp)) {
 		fgets(buffer, MAX_LINE, fp);
 		ReadBuffer(buffer, Head);
-		PrintPostfixResult(Head);
+		PrintPostfixResult(Head,count);
+		count++;
 		DeleteAfter(Head);
-		}
+	}
 
 	fclose(fp);
 
@@ -94,7 +96,7 @@ int Push(double number, Position Head) {
 	}
 
 	newElement->number = number;
-	
+
 	newElement->Next = Head->Next;
 	Head->Next = newElement;
 
@@ -103,9 +105,9 @@ int Push(double number, Position Head) {
 
 int Operation(char operand, Position Head) {
 	double num1 = 0, num2 = 0, result = 0;
-	
+
 	if (!Head->Next || !Head->Next->Next) {
-		printf("Incorrect postfix expression!	1"); //valjda
+		printf("Incorrect postfix expression!	1"); 
 		return POSTFIX_ERROR;
 	}
 
@@ -135,23 +137,27 @@ int Operation(char operand, Position Head) {
 	return EXIT_SUCCESS;
 }
 
-int Pop(Position Head){
+int Pop(Position Head) {
 	Position TEMP = Head->Next;
 	double temp_number = TEMP->number;
 	
+
+
 	Head->Next = TEMP->Next;
 	free(TEMP);
 
 	return temp_number;
 }
 
-int PrintPostfixResult(Position Head) {
+int PrintPostfixResult(Position Head,int count) {
+	
+
 	if (!Head->Next || Head->Next->Next) {
-		printf("Incorrect postfix expression!	3"); //valjda
+		printf("Incorrect postfix expression!	3");
 		return POSTFIX_ERROR;
 	}
 
-	printf("\nResult: %.2lf", Head->Next->number);
+	printf("\nResult of postfix expression %d.: %.2lf",count, Head->Next->number); //mala promjena u print, cisto ako ima vise izraza
 
 	return EXIT_SUCCESS;
 }
