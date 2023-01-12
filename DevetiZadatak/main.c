@@ -13,7 +13,7 @@ int main() {
 	Branch Root = NULL;
 	Branch Root2 = NULL;
 
-	int deall1 = 4, deall2 = 5, size = 10; // zbog flag-a ovdje ne bi trebalo biti inicijalizarno na 0, vec eto bzvz 4 i 5 sam stavio
+	int deall1 = 4, deall2 = 5, size = 10;
 	int predef_arr[] = { 2, 5, 7, 8, 11, 1, 4, 2, 3, 7 };
 	int* rand_arr;
 	char filename[MAX_FILENAME_SIZE] = { 0 };
