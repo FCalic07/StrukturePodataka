@@ -70,5 +70,8 @@ int ReadCitiesFromFile(Position newCountry, char* country_filename) {
 
 		newCountry->Root = CityEntry(newCountry->Root, newCity);
 	}
+
+	fclose(fp);
+
 	return EXIT_SUCCESS;
 }

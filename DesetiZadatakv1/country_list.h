@@ -12,3 +12,7 @@ typedef struct _country {
 
 Position CreateNewCountry(char* country_name, char* country_filename);
 int CountryEntry(Position Head, Position newCountry);
+int PrintCountries(Position Head);
+Position FindCountry(Position Head, char* country_name);
+int DeleteAfter(Position P);
+int DeallocationList(Position Head);

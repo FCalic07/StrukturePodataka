@@ -14,3 +14,4 @@ typedef struct _citytree {
 Branch CreateNewCity(char* city_name, int population);
 Branch CityEntry(Branch Root, Branch newCity);
 int InorderPrint(Branch City);
+int DeallocationTree(Branch Root);

@@ -54,3 +54,15 @@ int InorderPrint(Branch City) {
 
 	return EXIT_SUCCESS;
 }
+
+int DeallocationTree(Branch Root) {
+	if (NULL == Root)
+		return EXIT_SUCCESS;
+
+	DeallocationTree(Root->R);
+	DeallocationTree(Root->L);
+	free(Root);
+
+	return EXIT_SUCCESS;
+
+}

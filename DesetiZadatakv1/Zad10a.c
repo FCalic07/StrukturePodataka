@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include "constants.h"
 #include "filehandling.h"
+#include "querry.h"
 
 int Zadatak10a() {
 
@@ -20,6 +21,7 @@ int Zadatak10a() {
 	*/
 	CountryList Zeroth = { .country_name = {0},.Next = NULL,.Root = NULL };
 	Position Head = &Zeroth;
+	int status = 23;
 
 	char filename[MAX_NAME] = { 0 };
 	FILE* fp = NULL;
@@ -29,12 +31,23 @@ int Zadatak10a() {
 	scanf(" %s", filename);
 	
 	file_status = ReadStatesFromFile(Head, filename);
-
 	if (file_status) {
 		return FILE_OPENING_ERROR;
 	}
 
 	PrintAll(Head);
+
+	CityQuerry(Head);
+
+	//Dealokacija
+	status = DeallocationList(Head);
+	if (NULL == status) {
+		printf("\nDeallocation successfull!");
+	}
+	else {
+		printf("\nDeallocation unsuccessfull!");
+		return EXIT_FAILURE;
+	}
 
 	return EXIT_SUCCESS;
 }
