@@ -5,15 +5,6 @@
 #include "constants.h"
 
 
-char* GetFilename() {
-	char filename[MAX_FILENAME] = { 0 };
-
-	printf("\nPlease enter the <states> filename\n");
-	scanf(" %s", filename);
-
-	return filename;
-}
-
 int ReadStatesFromFile(Position Head, char* filename) {
 	FILE* fp = NULL;
 	Position newCountry = NULL;
