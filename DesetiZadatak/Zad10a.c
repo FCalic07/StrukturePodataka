@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include "constants.h"
 #include "filehandling.h"
-#include "querry.h"
+#include "querry_a).h"
 
 int Zadatak10a() {
 

@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "constants.h"
-#include "querry.h"
+#include "querry_a).h"
 
 int CityQuerry(Position Head) {
 	char country_name[MAX_NAME] = { 0 };

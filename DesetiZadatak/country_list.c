@@ -39,7 +39,7 @@ int PrintCountries(Position Head) {
 	Position Country = Head->Next;
 
 	while (Country) {
-		printf("\n- %s", Country->country_name);
+		printf("\n   -%s", Country->country_name);
 		Country = Country->Next;
 	}
 

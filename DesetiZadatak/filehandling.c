@@ -19,18 +19,19 @@ int ReadStatesFromFile(Position Head, char* filename) {
 	}
 
 	while (!feof(fp)) {
-		fscanf(fp, " %s %s", country_name, country_filename);
-		newCountry = CreateNewCountry(country_name, country_filename);
+		if (fscanf(fp, " %s %s", country_name, country_filename) == 2) {
+			newCountry = CreateNewCountry(country_name, country_filename);
 
-		if (!newCountry) {
-			return EXIT_FAILURE;
-		}
+			if (!newCountry) {
+				return EXIT_FAILURE;
+			}
 
-		CountryEntry(Head, newCountry);
+			CountryEntry(Head, newCountry);
 
-		city_status = ReadCitiesFromFile(newCountry, country_filename);
-		if (city_status) {
-			printf("\nCan't open %s's file", newCountry->country_name);
+			city_status = ReadCitiesFromFile(newCountry, country_filename);
+			if (city_status) {
+				printf("\nCan't open %s's file", newCountry->country_name);
+			}
 		}
 	}
 

@@ -49,7 +49,7 @@ int InorderPrint(Branch City) {
 		return NULL;
 
 	InorderPrint(City->L);
-	printf("%s  %d\n", City->name, City->population);
+	printf("\t%s  %d\n", City->name, City->population);
 	InorderPrint(City->R);
 
 	return EXIT_SUCCESS;

@@ -2,18 +2,18 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "Zad10a.h"
+#include "Zad10b.h" 
 
 static char Choice();
 
-/*dok sam gledo onaj izazov ovo sam ukro od sente
-ostalo je moje*/
+
 int main() {
 
 	switch (Choice()) {
 	case('A'):
-		return Zadatak10a();/*
-	case(2):
-		Zad10b();*/
+		return Zadatak10a();
+	case('B'):
+		return Zadatak10b();
 	default:
 		break;
 	}
