@@ -148,6 +148,66 @@ int Postorder(Branch Root) {
 }
 
 int LevelOrder(Branch Root) {
+	Queue Zeroth = { .Next = NULL,.P = NULL };
+	Position Head = &Zeroth;
+	Branch TEMP = NULL;
+
+	if (NULL == Root) //uvjet
+		return NULL;
+
+	Push(Head, Root); //last in
+
+	while (Head->Next) {
+		TEMP = Head->Next->P; //prvi ''Branch'' u queueu
+
+		printf("%d ", Head->Next->P->num);
+		Pop(Head); //first out
+
+		if (TEMP->L) {
+			Push(Head, TEMP->L); //stavi u queue ako ima
+		}
+		if (TEMP->R) {
+			Push(Head, TEMP->R); //stavi u queue ako ima
+		}
+	}
+
+	return EXIT_SUCCESS;
+}
+
+int Push(Position Head, Branch P) {
+	Position newElement = NULL;
+	Position Last = NULL;
+	newElement = (Position)malloc(sizeof(Queue));
+	if (!newElement) {
+		perror("Allocation error ");
+		return ALLOCATION_ERROR;
+	}
+	newElement->P = P;
+
+	Last = FindLast(Head);
+	newElement->Next = Last->Next;
+	Last->Next = newElement;
+
+	return EXIT_SUCCESS;
+}
+
+Position FindLast(Position Head) {
+	Position Last = Head;
+	while (Last->Next) {
+		Last = Last->Next;
+	}
+	return Last;
+}
+
+int Pop(Position Head) {
+	Position TEMP = Head->Next;
+	Head->Next = TEMP->Next;
+	free(TEMP);
+
+	return EXIT_SUCCESS;
+}
+
+int LevelOrder1(Branch Root) { //manje memorije zauzima ali sporije zato ne koristimo
 	int height = 0, i = 0;
 	height = Height(Root);
 
