@@ -7,4 +7,5 @@
 #define CLOSE_QUERRY (1)
 #define MAX_LINE (1024)
 #define FILE_OPENING_ERROR2 (NULL)
+#define prime (11)
 

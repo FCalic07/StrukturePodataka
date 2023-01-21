@@ -5,12 +5,13 @@
 #include "constants.h"
 
 
-int ReadStatesFromFile(Position Head, char* filename) {
+int ReadStatesFromFile(Position Head[], char* filename) {
 	FILE* fp = NULL;
 	Position newCountry = NULL;
 	char country_name[MAX_NAME] = { 0 };
 	char country_filename[MAX_FILENAME] = { 0 };
 	int city_status = 0;
+	int key = 0;
 
 	fp = fopen(filename, "r");
 	if (!fp) {
@@ -26,7 +27,9 @@ int ReadStatesFromFile(Position Head, char* filename) {
 				return EXIT_FAILURE;
 			}
 
-			CountryEntry(Head, newCountry);
+			key = HashKey(country_name);
+
+			CountryEntry(Head[key], newCountry);
 
 			city_status = ReadCitiesFromFile(newCountry, country_filename);
 			if (city_status) {
@@ -66,4 +69,22 @@ int ReadCitiesFromFile(Position newCountry, char* country_filename) {
 	fclose(fp);
 
 	return EXIT_SUCCESS;
+}
+
+int HashKey(char* country_name) {
+	int key = 0, i = 0, lenght = 0;
+
+	lenght = strlen(country_name);
+
+	if (lenght >= 5) {
+		for (i = 0; i < 5; i++) {
+			key += (int)country_name[i];
+		}
+	}
+	else
+		for (i = 0; i < lenght; i++) {
+			key += (int)country_name[i];
+		}
+
+	return key % prime;
 }

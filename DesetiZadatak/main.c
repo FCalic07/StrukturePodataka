@@ -6,7 +6,6 @@
 
 static char Choice();
 
-
 int main() {
 
 	switch (Choice()) {
